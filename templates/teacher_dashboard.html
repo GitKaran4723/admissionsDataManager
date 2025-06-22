@@ -24,7 +24,7 @@
   <input type="text" id="search" placeholder="Search by name, application, or phone" class="mb-4 w-full p-3 border rounded" onkeyup="filterStudents()">
 
   <!-- Stats -->
-  <div id="statsSection" class="grid gap-4 sm:grid-cols-3 mb-8">
+  <div id="statsSection" class="grid gap-4 sm:grid-cols-3 lg:grid-cols-5 mb-8">
     <div class="bg-white p-4 shadow rounded text-center">
       <p class="text-sm text-gray-500">Total Seats</p>
       <p class="text-2xl font-bold text-blue-600">{{ total_seats }}</p>
@@ -36,6 +36,14 @@
     <div class="bg-white p-4 shadow rounded text-center">
       <p class="text-sm text-gray-500">Vacant Seats</p>
       <p class="text-2xl font-bold text-red-500">{{ vacant_seats }}</p>
+    </div>
+    <div class="bg-white p-4 shadow rounded text-center">
+      <p class="text-sm text-gray-500">Students Withdrawing</p>
+      <p class="text-2xl font-bold text-yellow-500">{{ withdrawing_students }}</p>
+    </div>
+    <div class="bg-white p-4 shadow rounded text-center">
+      <p class="text-sm text-gray-500">Actual Class Strength</p>
+      <p class="text-2xl font-bold text-indigo-600">{{ actual_strength }}</p>
     </div>
     <div class="bg-white p-4 shadow rounded text-center col-span-full">
       <p class="text-sm text-gray-500">Total Fees Collected</p>

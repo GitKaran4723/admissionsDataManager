@@ -92,12 +92,17 @@ def teacher_dashboard():
         installment_cols = [col for col in data_df.columns if 'Installment' in col]
         total_collected = data_df[installment_cols].apply(pd.to_numeric, errors='coerce').fillna(0).sum().sum()
 
+        withdrawing_students = data_df[data_df['Joining'].str.upper().str.strip() == 'N'].shape[0]
+        actual_strength = filled_seats - withdrawing_students
+
         return render_template(
             'teacher_dashboard.html',
             students=student_preview.to_dict('records'),
             total_seats=total_seats,
             filled_seats=filled_seats,
             vacant_seats=vacant_seats,
+            withdrawing_students=withdrawing_students,
+            actual_strength=actual_strength,
             total_collected=int(total_collected)
         )
     return redirect('/')
