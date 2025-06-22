@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white shadow p-4 mb-6 space-y-2 sm:space-y-0">
+    <h2 class="text-lg font-bold text-blue-600">Welcome, {{ student['Candidate Name'] }}</h2>
+    <a href="/logout" class="bg-red-500 text-white px-4 py-1 rounded">Logout</a>
+  </div>
+
+  <div class="px-4 grid gap-6">
+
+    <!-- Personal Details -->
+    <div>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">Personal Details</h3>
+      <div class="bg-white border-l-4 border-blue-500 rounded-xl shadow p-4 space-y-2">
+        <p><strong>Application:</strong> {{ student['Application'] }}</p>
+        <p><strong>Rank:</strong> 
+          {% if student['Rank'] == '-' %}
+            <span class="text-orange-600 font-semibold">Applied after counselling</span>
+          {% else %}
+            {{ student['Rank'] }}
+          {% endif %}
+        </p>
+        <p><strong>Phone:</strong> <a href="tel:{{ student['Phone Number'] }}" class="text-blue-600 underline">{{ student['Phone Number'] }}</a></p>
+        <p><strong>Category:</strong> <span class="bg-green-100 text-green-800 px-2 py-1 rounded">{{ student['Category'] }}</span></p>
+        <p><strong>Seat Category:</strong> <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">{{ student['Seat Category'] }}</span></p>
+        <p><strong>Admission Date:</strong> {{ student['Admission Date'] }}</p>
+      </div>
+    </div>
+
+    {% if student['Seat Category'] %}
+    <!-- Total Fee Info -->
+    <div class="bg-white p-4 rounded-xl shadow border-l-4 border-indigo-500">
+      {% set seat = student['Seat Category'] %}
+      {% if 'PY' in seat %}
+        {% set total_fee = 77070 %}
+      {% elif 'OT' in seat %}
+        {% set total_fee = 79070 %}
+      {% else %}
+        {% set total_fee = 37070 %}
+      {% endif %}
+      <h3 class="text-xl font-bold text-gray-800 mb-2">💰 Total Fees: ₹{{ total_fee }}</h3>
+    </div>
+
+    <!-- Fees Paid Status -->
+    <div>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">Fees Paid Status</h3>
+      <div class="grid gap-4 sm:grid-cols-2">
+        {% set paid1 = student['1st Installment'] | int if student['1st Installment'] else 0 %}
+        {% set paid2 = student['2nd Installment'] | int if student['2nd Installment'] else 0 %}
+        {% set paid3 = student['3rd Installment'] | int if student['3rd Installment'] else 0 %}
+        {% set total_paid = paid1 + paid2 + paid3 %}
+        {% set remaining = total_fee - total_paid %}
+
+        {% if paid1 > 0 %}
+        <div class="bg-gradient-to-r from-green-300 to-green-500 text-white p-4 rounded-xl shadow-md">
+          <h4 class="text-lg font-bold">1st Installment</h4>
+          <p class="text-2xl font-semibold">₹ {{ paid1 }}</p>
+          <p class="mt-1">Receipt #: {{ student['Receipt # 1'] }}</p>
+          <p>Phone in Receipt: {{ student['Phone Number in Reciept'] }}</p>
+        </div>
+        {% endif %}
+
+        {% if paid2 > 0 %}
+        <div class="bg-gradient-to-r from-purple-400 to-purple-600 text-white p-4 rounded-xl shadow-md">
+          <h4 class="text-lg font-bold">2nd Installment</h4>
+          <p class="text-2xl font-semibold">₹ {{ paid2 }}</p>
+          <p class="mt-1">Receipt #: {{ student['Recipt # 2'] }}</p>
+        </div>
+        {% endif %}
+
+        {% if paid3 > 0 %}
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white p-4 rounded-xl shadow-md">
+          <h4 class="text-lg font-bold">3rd Installment</h4>
+          <p class="text-2xl font-semibold">₹ {{ paid3 }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if remaining > 0 %}
+        <div class="mt-4 text-red-600 font-bold text-lg">
+          🛑 Still to Pay: ₹{{ remaining }}
+        </div>
+      {% else %}
+        <div class="mt-4 text-green-600 font-bold text-lg">
+          ✅ All fees paid
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Document Status -->
+    <div>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">Document Status</h3>
+      <p class="text-sm text-gray-600 mb-3">Color codes: <span class="text-green-600 font-semibold">Green = Received</span>, <span class="text-red-600 font-semibold">Red = Not Submitted</span>, <span class="text-gray-600 font-semibold">Gray = Not Necessary</span>, <span class="text-yellow-600 font-semibold">Yellow = Xerox Submitted</span></p>
+      <div class="bg-white p-4 rounded-xl shadow grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {% set docs = {
+          '10th Marksheet': student['10th Marksheet'],
+          '12th Marksheet': student['12th Marksheet'],
+          'Income Certificate': student['Income Certficate'],
+          'Caste Certificate': student['Caste Certificate'],
+          'KM Certificate': student['KM Cerificate'],
+          'Rural Certificate': student['Rural Certificate'],
+          'HK Certificate': student['HK Certificate']
+        } %}
+
+        {% for doc, status in docs.items() %}
+          <div class="p-3 rounded shadow text-white text-sm font-medium text-center {{
+            'bg-green-500' if status == 'Y' else
+            'bg-red-500' if status == 'N' else
+            'bg-gray-400' if status == 'NN' else
+            'bg-yellow-500' if status == 'X' else
+            'bg-gray-300 text-black' }}">
+            {{ doc }}: {{ status }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="text-center bg-white p-6 rounded-xl shadow text-red-600 font-bold text-lg">
+      ⚠️ Sorry, no details available.<br>
+      You have not taken admission in Bangalore University Main Campus.
+    </div>
+    {% endif %}
+
+  </div>
+</body>
+</html>

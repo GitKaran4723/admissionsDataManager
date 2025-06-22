@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #f0f4ff, #e8f1fc);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+  <form method="post" class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md text-center">
+    <h2 class="text-2xl font-extrabold text-blue-700 mb-4 tracking-wide">👨‍🎓 Student Login</h2>
+    <p class="text-gray-500 mb-6">Enter your application and phone number to access your dashboard.</p>
+
+    <input type="text" name="application" placeholder="Application Number" class="w-full mb-3 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+
+    <input type="text" name="phone" placeholder="Phone Number" class="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg w-full transition">Login</button>
+  </form>
+</body>
+</html>
