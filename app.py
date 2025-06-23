@@ -93,7 +93,9 @@ def teacher_login():
 def teacher_dashboard():
     if 'role' in session and session['role'] == 'teacher':
         # Prepare student preview list
-        student_preview = data_df[['Application', 'Candidate Name', 'Phone Number']].fillna('')
+        student_preview = data_df[['Application', 'Candidate Name', 'Rank']].fillna('')
+
+
 
         # Seat statistics
         total_seats = 180
@@ -124,6 +126,7 @@ def teacher_dashboard():
 def api_view_student(app_id):
     if 'role' in session and session['role'] == 'teacher':
         student = data_df[data_df['Application'] == app_id].to_dict('records')
+        
         if student:
             return jsonify(student[0])
         return jsonify({'error': 'Student not found'}), 404

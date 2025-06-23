@@ -56,7 +56,7 @@
     <div onclick="showStudentModal('{{ student['Application'] }}')" class="cursor-pointer bg-white shadow rounded p-4 hover:bg-blue-50">
       <h3 class="font-bold text-lg">{{ student['Candidate Name'] }}</h3>
       <p>Application: {{ student['Application'] }}</p>
-      <p>Phone: {{ student['Phone Number'] }}</p>
+      <p>Rank: {{ student['Rank'] }}</p>
     </div>
     {% endfor %}
   </div>
@@ -76,6 +76,7 @@
       fetch(`/api/student/${appId}`)
         .then(res => res.json())
         .then(data => {
+          console.log(data);
           if (data.error) {
             document.getElementById('modalContent').innerHTML = '<p class="text-red-600">Student not found</p>';
             return;
@@ -115,15 +116,34 @@
             }
           });
           html += `<p class='text-lg font-bold text-red-600'>Remaining Fees: ₹ ${due}</p>`;
-          html += `<p class='mt-4'><strong>Documents:</strong></p><ul class='list-disc ml-6'>`;
-          const docFields = Object.keys(data).filter(k => k.startsWith('Doc:'));
+          html += `<p class='mt-4'><strong>Documents Submitted Status:</strong></p><ul class='list-disc ml-6'>`;
+            const docFields = Object.keys(data).filter(k => 
+              k.toLowerCase().includes('marksheet') || k.toLowerCase().includes('certificate')
+            );
+          console.log("doc fields",docFields)
+
+
           docFields.forEach(k => {
             let status = (data[k] || '').trim().toUpperCase();
             let color = status === 'Y' ? 'green' : (status === 'N' ? 'red' : (status === 'NN' ? 'gray' : 'yellow'));
-            html += `<li><span class='inline-block w-3 h-3 rounded-full bg-${color}-500 mr-2'></span>${k.replace('Doc:', '')} - ${status}</li>`;
+            html += `<li><span class='inline-block w-3 h-3 rounded-full bg-${color}-500 mr-2'></span>${k} </li>`;
           });
+
           html += `</ul>`;
           html += `</div>`;
+
+          html += `
+            <div class='mb-4 border border-gray-300 rounded-lg bg-gray-50 p-4 shadow-sm text-sm text-gray-700'>
+              <p class='font-semibold mb-2'>📄 Document Status Legend:</p>
+              <ul class='list-disc ml-6 space-y-1'>
+                <li><span class='inline-block w-3 h-3 rounded-full bg-green-500 mr-2'></span><strong>Green:</strong> Submitted</li>
+                <li><span class='inline-block w-3 h-3 rounded-full bg-yellow-500 mr-2'></span><strong>Yellow:</strong> Xerox Submitted</li>
+                <li><span class='inline-block w-3 h-3 rounded-full bg-red-500 mr-2'></span><strong>Red:</strong> Not Submitted</li>
+                <li><span class='inline-block w-3 h-3 rounded-full bg-gray-500 mr-2'></span><strong>Gray:</strong> Not Applicable</li>
+              </ul>
+            </div>
+          `;
+
 
           document.getElementById('modalContent').innerHTML = html;
         });
