@@ -13,28 +13,40 @@ app.secret_key = 'supersecretkey'
 
 # Global variable to store the DataFrame
 data_df = pd.DataFrame()
+last_hash = None
 
+# Efficient data fetch based on hash comparison
 def fetch_data():
-    global data_df
+    global data_df, last_hash
     while True:
         try:
-            url = os.getenv('AppScriptsURL')
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                df = pd.DataFrame(data)
+            hash_url = os.getenv('AppScriptsHashURL')  # e.g., https://script.google.com/macros/s/xxx/exec?mode=hash
+            data_url = os.getenv('AppScriptsURL')      # e.g., https://script.google.com/macros/s/xxx/exec
 
-                # Clean column names
-                df.columns = [col.strip() for col in df.columns]
+            hash_resp = requests.get(hash_url)
+            current_hash = hash_resp.text.strip()
 
-                # Cast critical fields to string
-                df['Application'] = df['Application'].astype(str).str.strip()
-                df['Phone Number'] = df['Phone Number'].astype(str).str.strip()
+            if current_hash != last_hash:
+                print("🔄 Data changed, fetching new data...")
+                data_resp = requests.get(data_url)
+                if data_resp.status_code == 200:
+                    df = pd.DataFrame(data_resp.json())
+                    df.columns = [col.strip() for col in df.columns]
+                    df['Application'] = df['Application'].astype(str).str.strip()
+                    df['Phone Number'] = df['Phone Number'].astype(str).str.strip()
+                    data_df = df
+                    last_hash = current_hash
+                else:
+                    print("⚠️ Error fetching data: bad status")
+            else:
+                print("✅ No change in data")
 
-                data_df = df
         except Exception as e:
-            print("Error fetching data:", e)
-        time.sleep(60)  # Refresh every minute
+            print("Error in fetch_data:", e)
+
+        time.sleep(300)
+
+Thread(target=fetch_data, daemon=True).start()
 
 # Background thread to fetch data
 Thread(target=fetch_data, daemon=True).start()
